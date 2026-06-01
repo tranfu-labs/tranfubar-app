@@ -1,22 +1,144 @@
-# TranFu AI 算力监控
+# TranFuBar App
 
-团队级 AI 算力资产与 Token 消耗监控 MVP。当前版本包含团队聚合 API / Web 看板，以及基于 CodexBar 改造的 macOS 个人端方案。
+TranFuBar App 是 TranFu 内部使用的 AI 算力与 Token 用量监控系统。它由两部分组成：
 
-## 设计边界
+- TranFuBar macOS 个人端：安装在团队成员自己的 Mac 上，查看 Codex / Claude 的本地用量、套餐、额度窗口和重置时间。
+- TranFuBar Team 团队端：部署在服务器上，接收个人端上报，展示团队、成员、供应商和节点维度的汇总数据。
 
-- 不采集、不保存 API Key。
-- 个人端只上报汇总后的使用事件或额度窗口：节点、成员、供应商、模型、Token、套餐、百分比、重置时间。
-- 第一版只启用和上报 Codex / Claude。
-- 本地采集参考 CodexBar 的思路：优先读取本机已有登录态和本地日志，不要求团队成员提交真实 API Key。
-- 团队端以节点上报为主，正式部署使用 SQLite 存储。
+当前版本只覆盖 Codex 和 Claude。系统不采集、不保存、不上传真实 API Key、Cookie、对话内容或源码内容；个人端只上报汇总后的用量与额度信息。
 
-## 运行
+## 适合解决什么问题
+
+- 团队里每个人的 Codex / Claude 使用情况不可见。
+- 不清楚哪些成员已经高频使用 AI Agent，哪些成员还没有形成习惯。
+- 订阅额度快用完时缺少提前提醒。
+- 团队想先用轻量方式评估 AI 原生组织的运行程度。
+
+## 当前能力
+
+- 个人端本地看板：展示 Codex / Claude 的套餐、今日用量、近 30 天用量、额度百分比和重置时间。
+- 团队端汇总看板：展示团队总览、成员明细、供应商拆分、节点活跃情况和告警。
+- 团队上报：个人端按刷新周期把汇总数据上报到团队服务。
+- SQLite 存储：服务端默认使用 SQLite，适合第一阶段内部部署。
+- 无演示数据：没有真实上报前，页面显示暂无数据。
+
+## 仓库内容
+
+```text
+public/                         # 团队端网页
+server/                         # 团队端 Node 服务
+scripts/                        # 本地采集和辅助脚本
+docs/deployment-tranfubar-team.md # 部署文档
+public/downloads/               # macOS 内测安装包
+```
+
+macOS 个人端内测包：
+
+```text
+public/downloads/TranFuBar-unsigned-test-arm64.zip
+```
+
+## 个人如何使用 TranFuBar
+
+### 1. 安装
+
+1. 从产品页或本仓库下载 `TranFuBar-unsigned-test-arm64.zip`。
+2. 解压后得到 `TranFuBar.app`。
+3. 建议把 `TranFuBar.app` 移到“应用程序”目录。
+4. 第一次打开时，因为当前是 unsigned 内测包，macOS 可能会拦截。
+5. 如果被拦截，右键点击 `TranFuBar.app`，选择“打开”，再确认打开。
+
+### 2. 确认本机已经在使用 Codex / Claude
+
+TranFuBar 读取的是本机已有的 Codex / Claude 使用数据。成员需要先在本机正常使用过 Codex 或 Claude，应用里才会逐步显示本地用量。
+
+不需要在 TranFuBar 里填写 Codex Key、Claude Key、Cookie 或账号密码。
+
+### 3. 查看个人用量
+
+打开 TranFuBar 后，点击电脑顶部菜单栏里的 TranFuBar 图标，可以看到：
+
+- Codex / Claude 当前账号或套餐信息。
+- 5 小时、每周等额度窗口的剩余百分比。
+- 下次重置时间。
+- 今日费用和 Token 用量。
+- 近 30 天费用和 Token 用量。
+- 常用模型。
+
+如果某个工具暂时没有数据，通常说明本机还没有对应日志、未登录、或者最近没有使用记录。
+
+### 4. 配置团队上报
+
+点击 TranFuBar 菜单底部的“设置”，找到“团队上报”，填写：
+
+```text
+团队服务地址：https://tranfubar-app.tranfu.com
+团队 ID：tranfu-ai
+成员名称：自己的中文名或英文名
+团队 Token：由团队管理员提供
+```
+
+然后开启“启用团队监控上报”。
+
+节点名称默认使用本机名称，不需要手动填写。团队端会用它区分不同电脑，例如办公电脑、备用电脑或测试机。
+
+### 5. 刷新和上报频率
+
+个人端默认刷新周期沿用 CodexBar 的逻辑，当前为 5 分钟。每次刷新后，如果团队上报已开启，会把 Codex / Claude 的汇总信息上报到团队服务。
+
+上报内容包括：
+
+- 成员名称
+- 本机节点
+- 供应商：Codex / Claude
+- 套餐名称
+- Token 用量汇总
+- 额度窗口百分比
+- 重置时间
+
+不上报的内容包括：
+
+- API Key
+- Cookie
+- 对话内容
+- 源码内容
+- 本机文件内容
+
+### 6. 常见问题
+
+如果打开后没有数据：
+
+- 先确认本机是否已经正常使用过 Codex / Claude。
+- 在 TranFuBar 里点击“刷新”。
+- 等待一个刷新周期后再看团队端。
+- 如果团队端仍然没有数据，检查“团队服务地址”“团队 ID”“团队 Token”是否填写正确。
+
+如果 macOS 提示无法打开：
+
+- 这是 unsigned 内测包的正常现象。
+- 右键点击 App，选择“打开”，再确认即可。
+
+如果个人端能看到数据，但团队端没有：
+
+- 先确认“启用团队监控上报”已经打开。
+- 确认团队服务地址可以在浏览器访问。
+- 确认团队 Token 和服务端配置一致。
+
+## 团队端本地运行
+
+安装依赖：
+
+```bash
+npm install
+```
+
+启动开发服务：
 
 ```bash
 npm run dev
 ```
 
-默认服务地址：
+默认访问地址：
 
 ```text
 http://127.0.0.1:4317
@@ -28,60 +150,42 @@ http://127.0.0.1:4317
 npm run seed
 ```
 
-## 产品拆分
-
-### 个人版：TranFuBar
-
-安装在团队成员自己的 Mac 上，负责本地看板、额度提醒和团队上报。个人端不采集、不上传真实 API Key、Cookie、对话内容或源码内容。
-
-个人端需要成员填写：
-
-- 团队服务地址，例如 `https://tranfubar-app.tranfu.com`。
-- 团队 ID，例如 `tranfu-ai`。
-- 成员名称，例如 `Alice`。
-- 节点名称，默认可用本机名称。
-- 团队 Token，用于上报校验。
-- 刷新频率，默认跟随 CodexBar。
-
-### 团队版：TranFu Usage Team
-
-部署在服务器或官网子路径，接收每台 TranFuBar 的上报，展示团队汇总、成员明细、供应商拆分、额度告警和 Agent 化程度。
-
-团队版上线前需要准备：
-
-- 域名和 HTTPS 证书。
-- 一台可运行 Node.js 20+ 的服务器。
-- 一个部署账号或容器运行环境。
-- 数据存储。测试期可继续使用 JSON 文件，正式期使用 SQLite。
-- 统一的 `teamId`。
-- 团队 Token，用于保护上报写入接口。
-
-部署文档见 [docs/deployment-tranfubar-team.md](docs/deployment-tranfubar-team.md)。
-
-## 本地个人端采集
-
-第一版推荐使用 `CodexBar/` 下改造后的 macOS 菜单栏应用：
-
-1. 安装并启动个人端应用。
-2. 打开设置，进入“团队上报”。
-3. 填写团队服务地址，例如 `http://127.0.0.1:4317`。
-4. 填写团队 ID 和成员名称。
-5. 开启“启用团队监控上报”。
-
-个人端默认刷新周期与 CodexBar 一致：5 分钟。用户可以在设置里的刷新频率中调整。每次刷新后，应用会把 Codex / Claude 的套餐、额度窗口百分比和重置时间上报到 `/api/node-heartbeat`。
-
-内部 unsigned 测试包构建命令：
+生产启动：
 
 ```bash
-cd CodexBar
-CODEXBAR_SIGNING=adhoc ./Scripts/package_app.sh release
+npm run start
 ```
 
-构建环境需要完整 Xcode / Swift 6.2 工具链，不能只安装旧版 Command Line Tools。
+部署文档见：
 
-命令行采集器保留为调试和服务器环境备用路径。
+```text
+docs/deployment-tranfubar-team.md
+```
 
-只扫描并打印本机 Codex/Claude 汇总数据：
+## 服务端环境变量
+
+生产环境建议使用：
+
+```bash
+NODE_ENV=production
+HOST=127.0.0.1
+PORT=4317
+DEFAULT_TEAM_ID=tranfu-ai
+
+STORE_BACKEND=sqlite
+SQLITE_PATH=/var/lib/tranfubar-app/usage.sqlite
+SQLITE_STORE_ID=tranfu-ai
+
+TEAM_INGEST_TOKEN=<团队上报 token>
+```
+
+没有真实上报前，数据库为空，页面显示“暂无数据”。
+
+## 命令行采集器
+
+macOS 个人端是推荐使用方式。命令行采集器保留给调试和服务器环境。
+
+只扫描本机 Codex / Claude 汇总数据：
 
 ```bash
 npm run scan
@@ -99,118 +203,52 @@ node scripts/local-agent.js --once --server http://127.0.0.1:4317 --user "Alice"
 node scripts/local-agent.js --server http://127.0.0.1:4317 --interval 60 --user "Alice"
 ```
 
-监控某个“对应 KEY/账号资产”时，不传真实 API Key，只传本地定义的资产 ID 和展示别名：
+带团队配置的示例：
 
 ```bash
 node scripts/local-agent.js \
-  --server http://127.0.0.1:4317 \
-  --interval 60 \
-  --user "Alice" \
+  --server https://tranfubar-app.tranfu.com \
   --team-id "tranfu-ai" \
   --team-token "$TEAM_INGEST_TOKEN" \
+  --user "Alice" \
   --credential-id "alice-codex-pro" \
-  --key-alias "Alice Codex Pro" \
-  --quota-window "5h,500000,2026-05-29T14:58:00+08:00" \
-  --quota-window "1w,5000000,2026-06-05T00:00:00+08:00"
+  --key-alias "Alice Codex Pro"
 ```
 
-`--quota-window` 格式是：
-
-```text
-duration,limitTokens,resetAt[,label]
-```
-
-示例：
-
-- `5h,500000,2026-05-29T14:58:00+08:00`
-- `1w,5000000,2026-06-05T00:00:00+08:00`
-
-看板会计算每个窗口的 `usedTokens / limitTokens`、`usagePercent`、`remainingPercent` 和重置时间，用于展示类似“5 小时 97% 14:58 / 1 周 99% 6月5日”的剩余额度视图。
-
-可选参数：
-
-- `--node-id <id>`：本机节点 ID，默认使用主机名。
-- `--team-id <id>`：团队 ID，默认 `default`。
-- `--team-token <token>`：团队上报 Token，也可以通过 `TEAM_INGEST_TOKEN` 环境变量传入。
-- `--credential-id <id>`：本地定义的 KEY/账号资产 ID，不要填真实 API Key。
-- `--key-alias <name>`：看板展示名。
-- `--quota-window <spec>`：额度窗口，可重复传。
-- `--since-days <n>`：扫描最近 N 天，默认 30。
-- `--codex-home <path>`：覆盖 Codex 目录，默认 `$CODEX_HOME` 或 `~/.codex`。
-- `--claude-home <path>`：覆盖 Claude 目录，默认 `$CLAUDE_CONFIG_DIR`、`~/.config/claude`、`~/.claude`。
-
-## API
-
-### `POST /api/usage-events`
-
-支持单条或数组上报。
-
-```json
-{
-  "nodeId": "macbook-pro-01",
-  "userName": "Alice",
-  "teamId": "tranfu-ai",
-  "provider": "codex",
-  "model": "gpt-5-codex",
-  "source": "local-log",
-  "timestamp": "2026-05-29T03:00:00.000Z",
-  "inputTokens": 12000,
-  "outputTokens": 3000,
-  "totalTokens": 15000,
-  "costUsd": null,
-  "requestCount": 8,
-  "resetAt": "2026-05-29T08:00:00.000Z"
-}
-```
+## 主要接口
 
 ### `POST /api/node-heartbeat`
 
-上报节点身份、套餐与额度窗口。个人端不会上传 API Key、Cookie 或对话内容。
+个人端上报节点身份、套餐与额度窗口。不会上传 API Key、Cookie 或对话内容。
 
-```json
-{
-  "nodeId": "macbook-pro-01",
-  "userName": "Alice",
-  "teamId": "tranfu-ai",
-  "hostName": "Alice-MacBook-Pro",
-  "role": "member",
-  "providers": ["codex", "claude"],
-  "credentials": [
-    {
-      "credentialId": "Alice-MacBook-Pro:claude",
-      "keyAlias": "Claude",
-      "provider": "claude",
-      "planName": "Pro",
-      "quotaWindows": [
-        {
-          "id": "primary",
-          "label": "5 小时",
-          "durationMinutes": 300,
-          "usagePercent": 0.03,
-          "remainingPercent": 0.97,
-          "resetAt": "2026-05-29T14:58:00+08:00"
-        },
-        {
-          "id": "secondary",
-          "label": "1 周",
-          "durationMinutes": 10080,
-          "usagePercent": 0.01,
-          "remainingPercent": 0.99,
-          "resetAt": "2026-06-05T00:00:00+08:00"
-        }
-      ]
-    }
-  ]
-}
-```
+### `POST /api/usage-events`
+
+命令行采集器或后续工具上报用量事件。
 
 ### `GET /api/summary`
 
-返回团队聚合视图、个人排行、供应商拆分、时间序列、告警和 Agent 化程度评估。
+团队看板读取聚合数据。
 
-## 后续工程化方向
+## 部署
 
-- 将 `data/usage-store.json` 替换为数据库。
-- 引入节点签名或团队 token，防止伪造上报。
-- 将 macOS 个人端做签名和 notarization。
-- 接入 OpenAI/Anthropic Admin API，补齐组织级账单视角。
+第一阶段推荐部署方式：
+
+- 阿里云服务器
+- Node.js 20+
+- SQLite
+- systemd 自动重启和开机自启
+- Caddy 反向代理 HTTPS
+
+完整步骤见：
+
+```text
+docs/deployment-tranfubar-team.md
+```
+
+## 后续计划
+
+- macOS 应用签名和 notarization。
+- 更细的成员与团队权限。
+- 更完整的 Claude 数据兼容。
+- 更多 provider 扩展。
+- 组织级账单 API 接入。
