@@ -1,0 +1,17 @@
+{
+  "name": "tranfubar-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Team-level AI token and quota monitoring MVP.",
+  "scripts": {
+    "dev": "node server/index.js",
+    "start": "node server/index.js",
+    "seed": "node scripts/seed-demo.js",
+    "scan": "node scripts/local-agent.js --once --print",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

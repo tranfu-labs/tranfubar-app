@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TranFu AI 算力监控</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">TF</div>
+          <div>
+            <div class="brand-title">TranFu Monitor</div>
+            <div class="brand-subtitle">AI Agent OS</div>
+          </div>
+        </div>
+        <nav class="nav-tabs" aria-label="视图">
+          <button class="nav-tab is-active" data-view="team" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" /></svg>
+            </span>
+            <span>团队</span>
+          </button>
+          <button class="nav-tab" data-view="personal" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-7 8a7 7 0 0 1 14 0Z" /></svg>
+            </span>
+            <span>个人</span>
+          </button>
+          <button class="nav-tab" data-view="events" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 6h14v2H5zm0 5h14v2H5zm0 5h14v2H5z" /></svg>
+            </span>
+            <span>事件</span>
+          </button>
+          <button class="nav-tab" data-view="onboarding" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M7 7h10v3h2V5H5v5h2zm10 10H7v-3H5v5h14v-5h-2zM8 11h8v2H8z" /></svg>
+            </span>
+            <span>接入</span>
+          </button>
+        </nav>
+        <div class="sidebar-status">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">连接中</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <h1>大模型 KEY 用量监控</h1>
+            <p><span class="terminal-label">$ tranfu usage --team</span> <span id="generatedAt">等待数据</span></p>
+          </div>
+          <div class="toolbar">
+            <label class="select-label">
+              <span>窗口</span>
+              <select id="windowSelect">
+                <option value="7">7 天</option>
+                <option value="30" selected>30 天</option>
+                <option value="60">60 天</option>
+              </select>
+            </label>
+            <label class="select-label">
+              <span>团队</span>
+              <select id="teamSelect">
+                <option value="">全部</option>
+                <option value="tranfu-ai">tranfu-ai</option>
+                <option value="default">default</option>
+              </select>
+            </label>
+            <button class="icon-button" id="refreshButton" type="button" aria-label="刷新" title="刷新">↻</button>
+          </div>
+        </header>
+
+        <section class="view is-active" id="teamView">
+          <div class="metric-grid">
+            <article class="metric-card">
+              <span class="metric-label">窗口内 Token</span>
+              <strong id="totalTokens">0</strong>
+              <small id="totalRequests">0 requests</small>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">今日 Token</span>
+              <strong id="todayTokens">0</strong>
+              <small id="todayCost">known $0</small>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">已知成本</span>
+              <strong id="knownCost">$0</strong>
+              <small>来自已上报数据</small>
+            </article>
+            <article class="metric-card agent-score-card">
+              <div class="score-ring" id="scoreRing"><span id="agentScore">0</span></div>
+              <div>
+                <span class="metric-label">Agent 化程度</span>
+                <strong id="agentLevel">起步</strong>
+                <small id="activeNodes">0 / 0 nodes</small>
+              </div>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel panel-wide">
+              <div class="panel-header">
+                <h2>Token 趋势</h2>
+                <span id="trendSummary">0 天</span>
+              </div>
+              <div class="bar-chart" id="dailyChart" aria-label="Token 趋势图"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <h2>告警</h2>
+                <span id="alertCount">0</span>
+              </div>
+              <div class="alert-list" id="alerts"></div>
+            </section>
+
+            <section class="panel panel-wide">
+              <div class="panel-header">
+                <h2>成员用量</h2>
+                <span id="userCount">0</span>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>成员</th>
+                      <th>今日额度</th>
+                      <th>窗口 Token</th>
+                      <th>请求</th>
+                      <th>供应商</th>
+                    </tr>
+                  </thead>
+                  <tbody id="usersTable"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <h2>供应商</h2>
+                <span id="providerCount">0</span>
+              </div>
+              <div class="provider-list" id="providers"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="personalView">
+          <div class="personal-layout">
+            <section class="panel">
+              <div class="panel-header">
+                <h2>成员</h2>
+                <span id="personalCount">0</span>
+              </div>
+              <div class="person-list" id="personList"></div>
+            </section>
+            <section class="panel panel-wide">
+              <div class="panel-header">
+                <h2 id="personTitle">个人看板</h2>
+                <span id="personStatus">未选择</span>
+              </div>
+              <div class="person-detail" id="personDetail"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="eventsView">
+          <section class="panel panel-full">
+            <div class="panel-header">
+              <h2>最近事件</h2>
+              <span id="eventTotal">0</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>时间</th>
+                    <th>节点</th>
+                    <th>KEY</th>
+                    <th>供应商</th>
+                    <th>模型</th>
+                    <th>Token</th>
+                    <th>来源</th>
+                  </tr>
+                </thead>
+                <tbody id="eventsTable"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="onboardingView">
+          <div class="intro-band">
+            <p class="section-kicker">// 产品</p>
+            <h2>个人端负责采集，团队端负责看全局。</h2>
+            <p>第一版只接 Codex 和 Claude。个人端不上传 API Key、Cookie 或对话内容，只上传套餐、额度窗口、Token 汇总和重置时间。</p>
+          </div>
+
+          <div class="product-grid">
+            <article class="product-card">
+              <div class="product-card-head">
+                <span class="product-badge">个人版</span>
+                <strong>TranFuBar</strong>
+              </div>
+              <p>安装在团队成员自己的 Mac 上，读取本地 Codex / Claude 登录态和日志，显示个人剩余额度，并把汇总数据上报团队服务。</p>
+              <dl class="info-list">
+                <div><dt>需要填写</dt><dd>团队服务地址、团队 ID、成员名称、节点名称、团队 Token</dd></div>
+                <div><dt>默认频率</dt><dd>跟随 CodexBar 刷新频率，可在设置里调整</dd></div>
+                <div><dt>不采集</dt><dd>真实 API Key、Cookie、对话内容、源码内容</dd></div>
+              </dl>
+            </article>
+
+            <article class="product-card">
+              <div class="product-card-head">
+                <span class="product-badge is-dark">团队版</span>
+                <strong>TranFu Usage Team</strong>
+              </div>
+              <p>部署在团队服务端，接收每个 TranFuBar 节点上报的数据，提供成员用量、供应商占比、额度告警和 Agent 化程度评估。</p>
+              <dl class="info-list">
+                <div><dt>需要准备</dt><dd>域名、服务器、HTTPS、SQLite、部署账号</dd></div>
+                <div><dt>建议补齐</dt><dd>团队 token、管理员入口、备份策略、运行日志</dd></div>
+                <div><dt>官网部署</dt><dd>页面风格已按 tranfu.com 的产品/资源布局靠拢</dd></div>
+              </dl>
+            </article>
+          </div>
+
+          <section class="panel setup-panel">
+            <div class="panel-header">
+              <h2>团队版上线前置清单</h2>
+              <span>v1</span>
+            </div>
+            <div class="checklist-grid">
+              <div class="check-item"><strong>服务器</strong><span>一台可公网访问的 Linux 服务器，先跑 Node 服务即可。</span></div>
+              <div class="check-item"><strong>域名</strong><span>tranfubar-app.tranfu.com 解析到服务器，并配置 HTTPS。</span></div>
+              <div class="check-item"><strong>数据存储</strong><span>正式环境使用 SQLite，便于部署、备份和排查。</span></div>
+              <div class="check-item"><strong>团队标识</strong><span>统一 teamId：tranfu-ai，个人端都填同一个。</span></div>
+              <div class="check-item"><strong>成员信息</strong><span>每个人填写成员名和节点名，便于团队面板识别。</span></div>
+              <div class="check-item"><strong>安全策略</strong><span>上报接口使用团队 Token，避免公网接口被随意写入。</span></div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
