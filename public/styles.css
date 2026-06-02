@@ -50,6 +50,7 @@ select:focus-visible {
 
 h1,
 h2,
+h3,
 p {
   margin: 0;
 }
@@ -682,6 +683,16 @@ td {
   background: var(--brand-dark);
 }
 
+.text-link {
+  color: var(--brand-dark);
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  color: var(--brand);
+}
+
 .product-badge {
   display: inline-flex;
   align-items: center;
@@ -726,6 +737,50 @@ td {
 
 .setup-panel {
   box-shadow: none;
+}
+
+.release-panel {
+  margin-bottom: 12px;
+}
+
+.release-list {
+  display: grid;
+  gap: 0;
+}
+
+.release-item {
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+.release-item:first-child {
+  padding-top: 4px;
+  border-top: 0;
+}
+
+.release-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+}
+
+.release-meta strong {
+  color: var(--brand-dark);
+}
+
+.release-item h3 {
+  margin-top: 8px;
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.release-item ul {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.7;
 }
 
 .checklist-grid {

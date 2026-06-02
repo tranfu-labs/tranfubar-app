@@ -38,6 +38,8 @@ macOS 个人端内测安装包：
 
 这是 unsigned 测试包，首次打开时 macOS 可能会拦截，按下面的个人使用步骤处理即可。
 
+当前最新版本：`v0.1.2-internal`
+
 版本记录：
 
 - [GitHub Releases](https://github.com/tranfu-labs/tranfubar-app/releases)
