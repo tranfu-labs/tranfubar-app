@@ -85,6 +85,38 @@ export function normalizeUsageEvent(input) {
   };
 }
 
+function eventTimestampMs(event) {
+  const time = new Date(event?.timestamp).getTime();
+  return Number.isFinite(time) ? time : 0;
+}
+
+function compareText(a, b) {
+  return String(a || "").localeCompare(String(b || ""), "zh-CN");
+}
+
+export function selectRecentUsageEvents(events, {
+  limit = 200,
+  teamId = null
+} = {}) {
+  const safeLimit = Math.min(Math.max(Number(limit) || 200, 1), 1000);
+  const filtered = (Array.isArray(events) ? events : []).filter((event) => {
+    return !teamId || event.teamId === teamId;
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    return eventTimestampMs(b) - eventTimestampMs(a)
+      || compareText(a.provider, b.provider)
+      || compareText(a.keyAlias || a.credentialId, b.keyAlias || b.credentialId)
+      || compareText(a.model, b.model)
+      || compareText(a.id, b.id);
+  });
+
+  return {
+    events: sorted.slice(0, safeLimit),
+    total: filtered.length
+  };
+}
+
 export function normalizeNodeState(input) {
   if (!input || typeof input !== "object") {
     throw new Error("node state must be an object");

@@ -6,6 +6,7 @@ import { stat } from "node:fs/promises";
 import { DEFAULT_HOST, DEFAULT_PORT } from "../src/config.js";
 import { aggregateStore } from "../src/aggregation.js";
 import { createStoreBackend } from "../src/store.js";
+import { selectRecentUsageEvents } from "../src/usage.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -129,10 +130,13 @@ async function route(req, res) {
 
   if (url.pathname === "/api/events" && req.method === "GET") {
     const currentStore = await store.load();
-    const limit = Math.min(Number(url.searchParams.get("limit") || 200), 1000);
+    const selected = selectRecentUsageEvents(currentStore.events, {
+      limit: url.searchParams.get("limit") || 200,
+      teamId: url.searchParams.get("teamId") || null
+    });
     sendJson(res, 200, {
-      events: currentStore.events.slice(-limit).reverse(),
-      total: currentStore.events.length
+      events: selected.events,
+      total: selected.total
     });
     return;
   }

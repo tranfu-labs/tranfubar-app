@@ -63,6 +63,21 @@ function formatDateTime(value) {
   }).format(new Date(value));
 }
 
+function formatDate(value) {
+  if (!value) return "-";
+  return new Intl.DateTimeFormat("zh-CN", {
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date(value));
+}
+
+function formatEventTime(event) {
+  if (String(event.source || "").endsWith("-daily")) {
+    return formatDate(event.timestamp);
+  }
+  return formatDateTime(event.timestamp);
+}
+
 function formatResetTime(value) {
   if (!value) return "-";
   const date = new Date(value);
@@ -170,7 +185,7 @@ async function loadData() {
 
   const [summaryRes, eventsRes] = await Promise.all([
     fetch(`/api/summary?${params.toString()}`),
-    fetch("/api/events?limit=200")
+    fetch(`/api/events?limit=200${els.teamSelect.value ? `&teamId=${encodeURIComponent(els.teamSelect.value)}` : ""}`)
   ]);
 
   if (!summaryRes.ok) throw new Error(`summary ${summaryRes.status}`);
@@ -361,7 +376,7 @@ function renderEvents() {
   }
   els.eventsTable.innerHTML = state.events.map((event) => `
     <tr>
-      <td>${formatDateTime(event.timestamp)}</td>
+      <td>${formatEventTime(event)}</td>
       <td>${escapeHtml(event.userName || event.nodeId)}</td>
       <td>${escapeHtml(event.keyAlias || event.credentialId || "-")}</td>
       <td>${escapeHtml(event.provider)}</td>
