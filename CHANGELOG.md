@@ -1,0 +1,44 @@
+# TranFuBar App 版本记录
+
+## v0.1.1-internal - 2026-06-02
+
+本版本修复团队看板接入后没有用量数据的问题。
+
+### 主要更新
+
+- 个人端 TranFuBar 增加每日 Token 用量上报。
+- 团队端可以展示今日 Token、Token 趋势、每个人当天用量。
+- 团队端在只有接入心跳、暂时没有 Token 事件时，也会显示供应商和当前额度占用。
+- 更新 macOS 内测安装包。
+
+### 使用说明
+
+- 服务器需要拉取最新 `main` 并重启服务。
+- 团队成员需要重新下载安装新版 TranFuBar。
+- 成员安装后等待一个刷新周期，通常约 5 分钟，团队看板会开始出现今日用量和趋势数据。
+
+### 下载
+
+[下载 TranFuBar macOS 内测安装包](https://github.com/tranfu-labs/tranfubar-app/releases/download/v0.1.1-internal/TranFuBar-unsigned-test-arm64.zip)
+
+## v0.1.0-internal - 2026-06-02
+
+第一个内部测试版本。
+
+### 主要更新
+
+- 提供 TranFuBar macOS 个人端内测包。
+- 支持 Codex / Claude 本地套餐、额度窗口、剩余额度和重置时间展示。
+- 支持团队上报配置：团队服务地址、团队 ID、成员名称、团队 Token。
+- 提供团队端 Web 看板。
+- 支持 SQLite 存储。
+- 提供部署文档和本地运行说明。
+
+### 已知限制
+
+- macOS 安装包暂未签名和公证，首次打开会有安全提醒。
+- 团队看板第一版主要展示接入状态和额度窗口，完整 Token 趋势在 v0.1.1 中补齐。
+
+### 下载
+
+[下载 TranFuBar macOS 内测安装包](https://github.com/tranfu-labs/tranfubar-app/releases/download/v0.1.0-internal/TranFuBar-unsigned-test-arm64.zip)

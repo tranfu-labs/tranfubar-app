@@ -38,6 +38,11 @@ macOS 个人端内测安装包：
 
 这是 unsigned 测试包，首次打开时 macOS 可能会拦截，按下面的个人使用步骤处理即可。
 
+版本记录：
+
+- [GitHub Releases](https://github.com/tranfu-labs/tranfubar-app/releases)
+- [CHANGELOG.md](CHANGELOG.md)
+
 ## 个人如何使用 TranFuBar
 
 ### 1. 安装
