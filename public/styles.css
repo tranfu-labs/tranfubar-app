@@ -9,7 +9,7 @@
   --muted: #667085;
   --line: #dfe4ea;
   --line-strong: #c9d1dc;
-  --brand: #ff2b35;
+  --brand: #e63138;
   --brand-dark: #b91420;
   --blue: #2563eb;
   --cyan: #0891b2;
@@ -94,10 +94,15 @@ h2 {
   height: 42px;
   display: grid;
   place-items: center;
-  border-radius: 8px;
-  background: var(--brand);
-  color: #ffffff;
-  font-weight: 850;
+  border-radius: 999px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.brand-mark img {
+  width: 42px;
+  height: 42px;
+  display: block;
 }
 
 .brand-title {
