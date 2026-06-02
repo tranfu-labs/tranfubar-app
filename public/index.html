@@ -162,50 +162,54 @@
           </div>
 
           <div class="dashboard-grid">
-            <section class="panel panel-wide">
-              <div class="panel-header">
-                <h2>Token 趋势</h2>
-                <span id="trendSummary">0 天</span>
-              </div>
-              <div class="bar-chart" id="dailyChart" aria-label="Token 趋势图"></div>
-            </section>
+            <div class="dashboard-column">
+              <section class="panel panel-wide">
+                <div class="panel-header">
+                  <h2>Token 趋势</h2>
+                  <span id="trendSummary">0 天</span>
+                </div>
+                <div class="bar-chart" id="dailyChart" aria-label="Token 趋势图"></div>
+              </section>
 
-            <section class="panel">
-              <div class="panel-header">
-                <h2>告警</h2>
-                <span id="alertCount">0</span>
-              </div>
-              <div class="alert-list" id="alerts"></div>
-            </section>
+              <section class="panel panel-wide">
+                <div class="panel-header">
+                  <h2>成员用量</h2>
+                  <span id="userCount">0</span>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>成员</th>
+                        <th>今日额度</th>
+                        <th>窗口 Token</th>
+                        <th>请求</th>
+                        <th>供应商</th>
+                      </tr>
+                    </thead>
+                    <tbody id="usersTable"></tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
 
-            <section class="panel panel-wide">
-              <div class="panel-header">
-                <h2>成员用量</h2>
-                <span id="userCount">0</span>
-              </div>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>成员</th>
-                      <th>今日额度</th>
-                      <th>窗口 Token</th>
-                      <th>请求</th>
-                      <th>供应商</th>
-                    </tr>
-                  </thead>
-                  <tbody id="usersTable"></tbody>
-                </table>
-              </div>
-            </section>
+            <div class="dashboard-column">
+              <section class="panel">
+                <div class="panel-header">
+                  <h2>告警</h2>
+                  <span id="alertCount">0</span>
+                </div>
+                <div class="alert-list" id="alerts"></div>
+              </section>
 
-            <section class="panel">
-              <div class="panel-header">
-                <h2>供应商</h2>
-                <span id="providerCount">0</span>
-              </div>
-              <div class="provider-list" id="providers"></div>
-            </section>
+              <section class="panel">
+                <div class="panel-header">
+                  <h2>供应商</h2>
+                  <span id="providerCount">0</span>
+                </div>
+                <div class="provider-list" id="providers"></div>
+              </section>
+            </div>
           </div>
         </section>
 
@@ -297,6 +301,18 @@
               <a class="text-link" href="https://github.com/tranfu-labs/tranfubar-app/releases">GitHub Releases</a>
             </div>
             <div class="release-list">
+              <article class="release-item">
+                <div class="release-meta">
+                  <strong>v0.1.4-internal</strong>
+                  <time datetime="2026-06-02">2026-06-02</time>
+                </div>
+                <h3>Token 趋势布局修复</h3>
+                <ul>
+                  <li>告警列表较长时，不再撑高 Token 趋势面板。</li>
+                  <li>成员用量紧跟在 Token 趋势下方。</li>
+                  <li>团队看板左右两列改为独立布局。</li>
+                </ul>
+              </article>
               <article class="release-item">
                 <div class="release-meta">
                   <strong>v0.1.3-internal</strong>
