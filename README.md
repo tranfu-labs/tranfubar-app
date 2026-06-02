@@ -32,17 +32,17 @@ docs/deployment-tranfubar-team.md # 部署文档
 public/downloads/               # macOS 内测安装包
 ```
 
-macOS 个人端内测包：
+macOS 个人端内测安装包：
 
-```text
-public/downloads/TranFuBar-unsigned-test-arm64.zip
-```
+[下载 TranFuBar macOS 内测安装包](https://github.com/tranfu-labs/tranfubar-app/releases/latest/download/TranFuBar-unsigned-test-arm64.zip)
+
+这是 unsigned 测试包，首次打开时 macOS 可能会拦截，按下面的个人使用步骤处理即可。
 
 ## 个人如何使用 TranFuBar
 
 ### 1. 安装
 
-1. 从产品页或本仓库下载 `TranFuBar-unsigned-test-arm64.zip`。
+1. 从产品页或点击上面的“下载 TranFuBar macOS 内测安装包”下载安装包。
 2. 解压后得到 `TranFuBar.app`。
 3. 建议把 `TranFuBar.app` 移到“应用程序”目录。
 4. 第一次打开时，因为当前是 unsigned 内测包，macOS 可能会拦截。
