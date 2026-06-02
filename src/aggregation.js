@@ -159,6 +159,7 @@ export function aggregateStore(store, options = {}) {
   }
 
   const teamNodes = Object.values(nodes).filter((node) => !teamId || node.teamId === teamId);
+  addHeartbeatProviders(byProvider, teamNodes);
   const knownNodeIds = new Set([...teamNodes.map((node) => node.nodeId), ...events.map((event) => event.nodeId)]);
   const activeNodeIds = new Set(events.map((event) => event.nodeId));
 
@@ -177,6 +178,11 @@ export function aggregateStore(store, options = {}) {
     };
     const dailyTokenLimit = node.quotaLimits?.dailyTokens || DEFAULT_QUOTA_LIMITS.dailyTokens;
     const monthlySpendLimit = node.quotaLimits?.monthlyUsd || DEFAULT_QUOTA_LIMITS.monthlyUsd;
+    const credentials = buildCredentialSummaries({
+      node,
+      nodeEvents: events.filter((event) => event.nodeId === nodeId),
+      now
+    });
     return {
       nodeId,
       userName: bucket.userName,
@@ -187,12 +193,9 @@ export function aggregateStore(store, options = {}) {
       lastSeenAt: bucket.lastSeenAt || node.lastSeenAt,
       totals: compactTotals(bucket.totals),
       todayTotals: compactTotals(bucket.todayTotals),
-      credentials: buildCredentialSummaries({
-        node,
-        nodeEvents: events.filter((event) => event.nodeId === nodeId),
-        now
-      }),
+      credentials,
       dailyTokenUtilization: utilizationPercent(bucket.todayTotals.totalTokens, dailyTokenLimit),
+      quotaWindowUtilization: currentQuotaWindowUtilization(credentials),
       monthlySpendUtilization: utilizationPercent(bucket.totals.knownCostUsd, monthlySpendLimit)
     };
   }).sort((a, b) => b.totals.totalTokens - a.totals.totalTokens);
@@ -252,6 +255,44 @@ function compactTotals(totals) {
     knownCostUsd: round(totals.knownCostUsd),
     requestCount: Math.round(totals.requestCount)
   };
+}
+
+function addHeartbeatProviders(byProvider, nodes) {
+  for (const node of nodes) {
+    const providers = new Set(node.providers || []);
+    for (const credential of node.credentials || []) {
+      if (credential.provider) providers.add(credential.provider);
+    }
+    for (const provider of providers) {
+      if (!byProvider.has(provider)) {
+        byProvider.set(provider, {
+          provider,
+          nodes: new Set(),
+          models: new Set(),
+          totals: emptyTotals()
+        });
+      }
+      byProvider.get(provider).nodes.add(node.nodeId);
+    }
+  }
+}
+
+function currentQuotaWindowUtilization(credentials) {
+  const windows = [];
+  for (const credential of credentials || []) {
+    for (const window of credential.quotaWindows || []) {
+      if (typeof window.usagePercent === "number" && Number.isFinite(window.usagePercent)) {
+        windows.push(window);
+      }
+    }
+  }
+  if (windows.length === 0) return null;
+  const currentWindows = windows.filter((window) => {
+    const minutes = Number(window.durationMinutes || 0);
+    return minutes > 0 && minutes <= 24 * 60;
+  });
+  const candidates = currentWindows.length > 0 ? currentWindows : windows;
+  return Math.max(...candidates.map((window) => window.usagePercent));
 }
 
 function buildCredentialSummaries({ node, nodeEvents, now }) {

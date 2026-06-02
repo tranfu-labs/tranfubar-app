@@ -137,5 +137,7 @@ test("aggregateStore exposes heartbeat-only plan and quota percentages", () => {
   assert.equal(credential.planName, "Pro");
   assert.equal(credential.quotaWindows.length, 2);
   assert.equal(Math.round(credential.quotaWindows[0].remainingPercent * 100), 97);
+  assert.equal(summary.providers.length, 2);
+  assert.equal(summary.users[0].quotaWindowUtilization, 0.03);
   assert.equal(summary.agentization.activeNodes, 1);
 });

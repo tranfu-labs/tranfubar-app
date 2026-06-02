@@ -246,23 +246,26 @@ function renderUsers(users) {
     return;
   }
 
-  els.usersTable.innerHTML = users.map((user) => `
-    <tr>
-      <td>
-        <div class="member-cell">
-          <strong>${escapeHtml(user.userName)}</strong>
-          <small>${escapeHtml(user.nodeId)} · ${formatDateTime(user.lastSeenAt)}</small>
-        </div>
-      </td>
-      <td>
-        ${renderProgress(user.dailyTokenUtilization)}
-        <small class="muted">${percent(user.dailyTokenUtilization)}</small>
-      </td>
-      <td>${formatNumber(user.totals.totalTokens)}</td>
-      <td>${formatNumber(user.totals.requestCount)}</td>
-      <td>${renderPills(user.providers)}</td>
-    </tr>
-  `).join("");
+  els.usersTable.innerHTML = users.map((user) => {
+    const quotaValue = user.quotaWindowUtilization ?? user.dailyTokenUtilization;
+    return `
+      <tr>
+        <td>
+          <div class="member-cell">
+            <strong>${escapeHtml(user.userName)}</strong>
+            <small>${escapeHtml(user.nodeId)} · ${formatDateTime(user.lastSeenAt)}</small>
+          </div>
+        </td>
+        <td>
+          ${renderProgress(quotaValue)}
+          <small class="muted">${percent(quotaValue)}</small>
+        </td>
+        <td>${formatNumber(user.totals.totalTokens)}</td>
+        <td>${formatNumber(user.totals.requestCount)}</td>
+        <td>${renderPills(user.providers)}</td>
+      </tr>
+    `;
+  }).join("");
 }
 
 function renderProviders(providers, totalTokens) {
@@ -307,6 +310,7 @@ function renderPersonal() {
 
   els.personTitle.textContent = selected.userName;
   els.personStatus.textContent = `${selected.providers.length} providers`;
+  const quotaValue = selected.quotaWindowUtilization ?? selected.dailyTokenUtilization;
   els.personDetail.innerHTML = `
     <div class="detail-grid">
       <div class="detail-block">
@@ -328,8 +332,8 @@ function renderPersonal() {
     </div>
     <div class="detail-block">
       <strong>今日额度占用</strong>
-      ${renderProgress(selected.dailyTokenUtilization)}
-      <span class="muted">${percent(selected.dailyTokenUtilization)}</span>
+      ${renderProgress(quotaValue)}
+      <span class="muted">${percent(quotaValue)}</span>
     </div>
     <div class="detail-block">
       <strong>模型</strong>
