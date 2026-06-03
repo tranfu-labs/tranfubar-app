@@ -50,9 +50,15 @@ macOS 个人端内测安装包：
 ### 1. 安装
 
 1. 从产品页或点击上面的“下载 TranFuBar macOS 内测安装包”下载安装包。
-2. 解压后得到 `TranFuBar.app`。
-3. 第一次打开时，因为当前是 unsigned 内测包，macOS 可能会拦截。
-4. 手动放行：请前往 “系统设置” -> “隐私与安全性”，在安全性下方找到该软件的拦截提示，点击 “仍要打开” 即可。
+2. 解压后得到 `TranFuBar.app`、`Open-First.command` 和首次打开说明。
+3. 第一次打开时，双击 `Open-First.command`，它会解除当前文件夹里 `TranFuBar.app` 的下载隔离标记并启动应用。
+4. 如果系统仍然拦截，请前往 “系统设置” -> “隐私与安全性”，在安全性下方找到该软件的拦截提示，点击 “仍要打开”。
+
+也可以用一行命令安装到 `~/Applications`：
+
+```bash
+curl -fsSL https://tranfubar-app.tranfu.com/downloads/install-tranfubar.sh | bash
+```
 
 ### 2. 确认本机已经在使用 Codex / Claude
 
@@ -122,7 +128,8 @@ TranFuBar 读取的是本机已有的 Codex / Claude 使用数据。成员需要
 如果 macOS 提示无法打开：
 
 - 这是 unsigned 内测包的正常现象。
-- 右键点击 App，选择“打开”，再确认即可。
+- 解压后双击 `Open-First.command`。
+- 如果仍被拦截，到 “系统设置” -> “隐私与安全性” 里点击 “仍要打开”。
 
 如果个人端能看到数据，但团队端没有：
 

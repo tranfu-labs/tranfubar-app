@@ -274,6 +274,8 @@
               <div class="product-actions">
                 <a class="primary-link" href="https://github.com/tranfu-labs/tranfubar-app/releases/latest/download/TranFuBar-unsigned-test-arm64.zip">下载 macOS 内测包</a>
               </div>
+              <p class="download-note">当前是 unsigned 内测包。首次打开被 macOS 拦截时，解压后双击包内的 Open-First.command。</p>
+              <code class="install-command">curl -fsSL https://tranfubar-app.tranfu.com/downloads/install-tranfubar.sh | bash</code>
               <dl class="info-list">
                 <div><dt>需要填写</dt><dd>团队服务地址、团队 ID、成员名称、节点名称、团队 Token</dd></div>
                 <div><dt>默认频率</dt><dd>跟随 CodexBar 刷新频率，可在设置里调整</dd></div>
@@ -311,6 +313,7 @@
                   <li>顶部菜单栏默认显示 TranFu 图标、Codex / Claude 图标和百分比。</li>
                   <li>修复显示设置开启后菜单栏样式没有生效的问题。</li>
                   <li>每次启动后都会发送系统通知提醒，并更新 macOS 内测安装包。</li>
+                  <li>安装包加入首次打开助手，降低 unsigned 内测包在新设备上的打开失败率。</li>
                 </ul>
               </article>
               <article class="release-item">
