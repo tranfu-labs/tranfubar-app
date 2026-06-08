@@ -83,7 +83,7 @@ dig tranfubar-app.tranfu.com +short
 
 ### Docker Compose 部署
 
-如果服务器已有 Docker 和 Docker Compose，可以直接使用仓库里的 `Dockerfile` 和 `docker-compose.yml`，不需要在宿主机安装 Node.js 或 SQLite。
+如果服务器已有 Docker 和 Docker Compose，可以直接使用仓库里的 `Dockerfile` 和 `compose.yml`，不需要在宿主机安装 Node.js 或 SQLite。
 
 准备环境变量：
 
