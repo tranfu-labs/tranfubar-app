@@ -1,5 +1,8 @@
 node_modules/
 .DS_Store
+.env
+.env.*
+!.env.example
 data/usage-store.json
 data/*.tmp
 *.log

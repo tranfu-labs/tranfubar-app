@@ -1,0 +1,11 @@
+tranfubar-app.tranfu.com {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:4317
+
+    tls {
+        dns alidns {
+            access_key_id {env.ALICLOUD_ACCESS_KEY}
+            access_key_secret {env.ALICLOUD_SECRET_KEY}
+        }
+    }
+}

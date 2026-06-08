@@ -81,6 +81,49 @@ dig tranfubar-app.tranfu.com +short
 
 建议使用 Ubuntu 22.04/24.04。
 
+### Docker Compose 部署
+
+如果服务器已有 Docker 和 Docker Compose，可以直接使用仓库里的 `Dockerfile` 和 `docker-compose.yml`，不需要在宿主机安装 Node.js 或 SQLite。
+
+准备环境变量：
+
+```bash
+cp .env.example .env
+openssl rand -hex 32
+nano .env
+```
+
+把 `.env` 里的 `TEAM_INGEST_TOKEN` 改成上一步生成的 token。默认只绑定宿主机 `127.0.0.1:4317`，适合由 Caddy/Nginx 反向代理；如果需要直接开放端口，可以把 `TRANFUBAR_BIND` 改成 `0.0.0.0`。
+
+启动：
+
+```bash
+docker compose up -d --build
+docker compose ps
+docker compose logs -f tranfubar-app
+```
+
+检查健康状态：
+
+```bash
+curl http://127.0.0.1:4317/healthz
+```
+
+数据会保存在 Docker named volume `tranfubar-data` 中，容器内路径为：
+
+```text
+/data/usage.sqlite
+```
+
+更新：
+
+```bash
+git pull --ff-only
+docker compose up -d --build
+```
+
+### systemd 部署
+
 安装 Node.js 20+ 和 SQLite：
 
 ```bash
@@ -201,14 +244,70 @@ journalctl -u tranfubar-app -f
 
 ```caddy
 tranfubar-app.tranfu.com {
-  encode zstd gzip
-  reverse_proxy 127.0.0.1:4317
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:4317
+
+    tls {
+        dns alidns {
+            access_key_id {env.ALICLOUD_ACCESS_KEY}
+            access_key_secret {env.ALICLOUD_SECRET_KEY}
+        }
+    }
 }
+```
+
+仓库内也有可复制的示例文件：
+
+```text
+deploy/Caddyfile.example
+```
+
+注意：`dns alidns` 需要 Caddy 带 `dns.providers.alidns` 模块。可以先检查：
+
+```bash
+caddy list-modules | grep dns.providers.alidns
+```
+
+如果 Caddy 是 systemd 启动，确保 `ALICLOUD_ACCESS_KEY` 和 `ALICLOUD_SECRET_KEY` 已经注入到 Caddy 服务环境里。
+
+推荐用独立环境变量文件：
+
+```bash
+sudo nano /etc/caddy/alidns.env
+```
+
+写入：
+
+```bash
+ALICLOUD_ACCESS_KEY=<阿里云 AccessKey ID>
+ALICLOUD_SECRET_KEY=<阿里云 AccessKey Secret>
+```
+
+设置权限并挂到 Caddy 服务：
+
+```bash
+sudo chmod 600 /etc/caddy/alidns.env
+sudo systemctl edit caddy
+```
+
+写入：
+
+```ini
+[Service]
+EnvironmentFile=/etc/caddy/alidns.env
+```
+
+然后执行：
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart caddy
 ```
 
 重载：
 
 ```bash
+sudo caddy validate --config /etc/caddy/Caddyfile
 sudo systemctl reload caddy
 sudo systemctl status caddy
 ```
