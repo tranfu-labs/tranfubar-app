@@ -256,12 +256,6 @@ tranfubar-app.tranfu.com {
 }
 ```
 
-仓库内也有可复制的示例文件：
-
-```text
-deploy/Caddyfile.example
-```
-
 注意：`dns alidns` 需要 Caddy 带 `dns.providers.alidns` 模块。可以先检查：
 
 ```bash
