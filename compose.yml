@@ -14,8 +14,8 @@ services:
       SQLITE_PATH: /data/usage.sqlite
       SQLITE_STORE_ID: ${SQLITE_STORE_ID:-tranfu-ai}
       TEAM_INGEST_TOKEN: ${TEAM_INGEST_TOKEN:-change-me}
-    ports:
-      - "${TRANFUBAR_BIND:-127.0.0.1}:${TRANFUBAR_PORT:-4317}:4317"
+    expose:
+      - "4317"
     volumes:
       - tranfubar-data:/data
 
